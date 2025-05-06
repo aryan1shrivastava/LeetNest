@@ -4,6 +4,8 @@ import {
   submitBatch,
 } from "../libs/judge0.lib.js";
 
+import { db } from "../libs/db.js";
+
 export const executeCode = async (req, res) => {
   try {
     const { source_code, language_id, stdin, expected_outputs, problemId } =
@@ -81,7 +83,7 @@ export const executeCode = async (req, res) => {
         userId,
         problemId,
         sourceCode: source_code,
-        langauge: getLanguageName(language_id),
+        language: getLanguageName(language_id),
         stdin: stdin.join("\n"),
         stdout: JSON.stringify(detailedResults.map((result) => result.stdout)),
         stderr: detailedResults.some((result) => result.stderr)
@@ -121,8 +123,38 @@ export const executeCode = async (req, res) => {
       });
     }
 
+    // save individual test case results in database
+
+    const testCaseResults = detailedResults.map((result, i) => ({
+      submissionId: submission.id,
+      testCase: result.testCase,
+      passed: result.passed,
+      stdout: result.stdout,
+      stderr: result.stderr,
+      expected: result.expected,
+      status: result.status,
+      compileOutput: result.compileOutput,
+      memory: result.memory,
+      time: result.time,
+    }));
+
+    await db.testCaseResult.createMany({
+      data: testCaseResults,
+    });
+
+    const submissionWithTestCase = await db.submission.findUnique({
+      where: {
+        id: submission.id,
+      },
+      include: {
+        testCases: true,
+      },
+    });
+
     res.status(200).json({
-      message: "Code Executed!",
+      success: true,
+      message: "Code executed successfully",
+      submission: submissionWithTestCase,
     });
   } catch (error) {
     console.error("Execute Code Error:", error);
