@@ -47,3 +47,14 @@ export const submitBatch = async (submissions) => {
 
   return data; // [{token} , {token} , {token}]
 };
+
+export function getLanguageName(languageId) {
+  const LANGUAGE_NAMES = {
+    71: "Python",
+    62: "Java",
+    63: "JavaScript",
+    74: "Typescript",
+  };
+
+  return LANGUAGE_NAMES[languageId] || "Unknown Language";
+}

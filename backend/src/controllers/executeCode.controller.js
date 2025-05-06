@@ -1,4 +1,8 @@
-import { pollBatchResults, submitBatch } from "../libs/judge0.lib.js";
+import {
+  getLanguageName,
+  pollBatchResults,
+  submitBatch,
+} from "../libs/judge0.lib.js";
 
 export const executeCode = async (req, res) => {
   try {
@@ -35,6 +39,87 @@ export const executeCode = async (req, res) => {
 
     console.log("Result-------------");
     console.log(results);
+
+    //analyse test case results
+
+    let allPassed = true;
+    const detailedResults = results.map((result, i) => {
+      const stdout = result.stdout?.trim();
+      const expected_output = expected_outputs[i]?.trim();
+      const passed = stdout === expected_output;
+
+      if (!passed) {
+        allPassed = false;
+      }
+      return {
+        testCase: i + 1,
+        passed,
+        stdout,
+        expected: expected_output,
+        stderr: result.stderr || null,
+        compileOutput: result.compileOutput || null,
+        status: result.status.description,
+        memory: result.memory ? `${result.memory} KB` : undefined,
+        time: result.time ? `${result.time} sec` : undefined,
+      };
+
+      // console.log(`Testcase ${i + 1}:`);
+      // console.log(`input: ${stdin[i]}`);
+      // console.log(`Expected output: ${expected_output}`);
+      // console.log(`Actual output: ${stdout}`);
+
+      // console.log(`match: ${passed}`);
+      // console.log("---------------------");
+    });
+
+    console.log(detailedResults);
+
+    //store submission summary in database
+
+    const submission = await db.submission.create({
+      data: {
+        userId,
+        problemId,
+        sourceCode: source_code,
+        langauge: getLanguageName(language_id),
+        stdin: stdin.join("\n"),
+        stdout: JSON.stringify(detailedResults.map((result) => result.stdout)),
+        stderr: detailedResults.some((result) => result.stderr)
+          ? JSON.stringify(detailedResults.map((result) => result.stderr))
+          : null,
+        compileOutput: detailedResults.some((result) => result.compileOutput)
+          ? JSON.stringify(
+              detailedResults.map((result) => result.compileOutput)
+            )
+          : null,
+        status: allPassed ? "Accepted" : "Wrong Answer",
+        memory: detailedResults.some((result) => result.memory)
+          ? JSON.stringify(detailedResults.map((result) => result.memory))
+          : null,
+        time: detailedResults.some((result) => result.time)
+          ? JSON.stringify(detailedResults.map((result) => result.time))
+          : null,
+      },
+    });
+
+    //if all test cases passed, update problem status to solved for the user
+
+    if (allPassed) {
+      // upsert means if the record exists, update it, otherwise create a new one
+      await db.problemSolved.upsert({
+        where: {
+          userId_problemId: {
+            userId,
+            problemId,
+          },
+        },
+        update: {},
+        create: {
+          userId,
+          problemId,
+        },
+      });
+    }
 
     res.status(200).json({
       message: "Code Executed!",
