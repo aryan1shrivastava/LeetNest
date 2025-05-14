@@ -6,13 +6,27 @@ import SignUpPage from "./page/SignUpPage.jsx";
 import ProfilePage from "./page/ProfilePage.jsx";
 
 const App = () => {
+  let authUser = null;
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen ">
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route
+          path="/"
+          element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/login"
+          element={!authUser ? <LoginPage /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/signup"
+          element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/profile"
+          element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
+        />
       </Routes>
     </div>
   );
