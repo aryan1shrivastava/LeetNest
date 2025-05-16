@@ -3,7 +3,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { Code, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
+
 import { z } from "zod";
+import AuthImagePattern from "../components/AuthImagePattern.jsx";
+import { useAuthStore } from "../store/useAuthStore.js";
 
 const SignUpSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -13,7 +16,8 @@ const SignUpSchema = z.object({
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSigningUp, setIsSigningUp] = useState(false);
+
+  const { signup, isSigninUp } = useAuthStore();
 
   const {
     register,
@@ -24,7 +28,12 @@ const SignUpPage = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log(data);
+    try {
+      await signup(data);
+      console.log("signup data", data);
+    } catch (error) {
+      console.error("SignUp failed:", error);
+    }
   };
 
   return (
@@ -134,9 +143,9 @@ const SignUpPage = () => {
             <button
               type="submit"
               className="btn btn-primary w-full"
-              disabled={isSigningUp}
+              disabled={isSigninUp}
             >
-              {isSigningUp ? (
+              {isSigninUp ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
                   Loading...
@@ -158,13 +167,14 @@ const SignUpPage = () => {
           </div>
         </div>
       </div>
+
       {/* Right Side - Image/Pattern */}
-      {/* <AuthImagePattern
+      <AuthImagePattern
         title={"Welcome to our platform!"}
         subtitle={
           "Sign up to access our platform and start using our services."
         }
-      /> */}
+      />
     </div>
   );
 };
