@@ -132,7 +132,7 @@ const ProblemsTable = ({ problems }) => {
           <tbody>
             {paginatedProblems.length > 0 ? (
               paginatedProblems.map((problem) => {
-                const isSolved = problem.solvedBy.some(
+                const isSolved = problem.solvedBy?.some(
                   (user) => user.userId === authUser?.id
                 );
                 return (
