@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import {
   Play,
@@ -17,32 +16,44 @@ import {
   ThumbsUp,
   Home,
 } from "lucide-react";
-
+import { Link, useParams } from "react-router-dom";
 import { useProblemStore } from "../store/useProblemStore";
-import { useExecutionStore } from "../store/useExecutionStore";
 import { getLanguageId } from "../lib/lang";
-import SubmissionResults from "../components/Submission";
+import { useExecutionStore } from "../store/useExecutionStore";
+import { useSubmissionStore } from "../store/useSubmissionStore";
+import Submission from "../components/Submission.jsx";
+import SubmissionsList from "../components/SubmissionList.jsx";
 
 const ProblemPage = () => {
   const { id } = useParams();
   const { getProblemById, problem, isProblemLoading } = useProblemStore();
+
+  const {
+    submission: submissions,
+    isLoading: isSubmissionsLoading,
+    getSubmissionForProblem,
+    getSubmissionCountForProblem,
+    submissionCount,
+  } = useSubmissionStore();
+
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [testCases, setTestCases] = useState([]);
+  const [testcases, setTestCases] = useState([]);
 
   const { executeCode, submission, isExecuting } = useExecutionStore();
 
-  const submissionCount = 10;
   useEffect(() => {
     getProblemById(id);
+    getSubmissionCountForProblem(id);
   }, [id]);
 
   useEffect(() => {
     if (problem) {
-      setCode(problem.codeSnippets?.[selectedLanguage] || "");
-
+      setCode(
+        problem.codeSnippets?.[selectedLanguage] || submission?.sourceCode || ""
+      );
       setTestCases(
         problem.testcases?.map((tc) => ({
           input: tc.input,
@@ -52,11 +63,42 @@ const ProblemPage = () => {
     }
   }, [problem, selectedLanguage]);
 
+  useEffect(() => {
+    if (activeTab === "submissions" && id) {
+      getSubmissionForProblem(id);
+    }
+  }, [activeTab, id]);
+
+  console.log("submission", submissions);
+
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
     setCode(problem.codeSnippets?.[lang] || "");
   };
+
+  const handleRunCode = (e) => {
+    e.preventDefault();
+    try {
+      const language_id = getLanguageId(selectedLanguage);
+      const stdin = problem.testcases.map((tc) => tc.input);
+      const expected_outputs = problem.testcases.map((tc) => tc.output);
+      executeCode(code, language_id, stdin, expected_outputs, id);
+    } catch (error) {
+      console.log("Error executing code", error);
+    }
+  };
+
+  if (isProblemLoading || !problem) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-base-200">
+        <div className="card bg-base-100 p-8 shadow-xl">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+          <p className="mt-4 text-base-content/70">Loading problem...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -120,11 +162,11 @@ const ProblemPage = () => {
         );
       case "submissions":
         return (
-          <div className="p-4 text-center text-base-content/70">
-            No Submisssion
-          </div>
+          <SubmissionsList
+            submissions={submissions}
+            isLoading={isSubmissionsLoading}
+          />
         );
-      // return <SubmissionsList submissions={submissions} isLoading={isSubmissionsLoading} />;
       case "discussion":
         return (
           <div className="p-4 text-center text-base-content/70">
@@ -152,22 +194,10 @@ const ProblemPage = () => {
     }
   };
 
-  const handleRunCode = (e) => {
-    e.preventDefault();
-    try {
-      const language_id = getLanguageId(selectedLanguage);
-      const stdin = problem.testcases.map((tc) => tc.input);
-      const expected_outputs = problem.testcases.map((tc) => tc.output);
-      executeCode(code, language_id, stdin, expected_outputs, id);
-    } catch (error) {
-      console.log("Error executing code", error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full">
       <nav className="navbar bg-base-100 shadow-lg px-4">
-        <div className="flex-1 gap-2 container items-center">
+        <div className="flex-1 gap-2">
           <Link to={"/"} className="flex items-center gap-2 text-primary">
             <Home className="w-6 h-6" />
             <ChevronRight className="w-4 h-4" />
@@ -186,7 +216,7 @@ const ProblemPage = () => {
               </span>
               <span className="text-base-content/30">•</span>
               <Users className="w-4 h-4" />
-              <span>{10} Submissions</span>
+              {/* <span>{submissionCount} Submissions</span> */}
               <span className="text-base-content/30">•</span>
               <ThumbsUp className="w-4 h-4" />
               <span>95% Success Rate</span>
@@ -284,7 +314,7 @@ const ProblemPage = () => {
                   onChange={(value) => setCode(value || "")}
                   options={{
                     minimap: { enabled: false },
-                    fontSize: 22,
+                    fontSize: 20,
                     lineNumbers: "on",
                     roundedSelection: false,
                     scrollBeyondLastLine: false,
@@ -299,7 +329,7 @@ const ProblemPage = () => {
                   <button
                     className={`btn btn-primary gap-2 ${
                       isExecuting ? "loading" : ""
-                    } `}
+                    }`}
                     onClick={handleRunCode}
                     disabled={isExecuting}
                   >
@@ -318,7 +348,7 @@ const ProblemPage = () => {
         <div className="card bg-base-100 shadow-xl mt-6">
           <div className="card-body">
             {submission ? (
-              <SubmissionResults submission={submission} />
+              <Submission submission={submission} />
             ) : (
               <>
                 <div className="flex items-center justify-between mb-6">
@@ -333,7 +363,7 @@ const ProblemPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {testCases.map((testCase, index) => (
+                      {testcases.map((testCase, index) => (
                         <tr key={index}>
                           <td className="font-mono">{testCase.input}</td>
                           <td className="font-mono">{testCase.output}</td>
