@@ -60,7 +60,8 @@ export const getAllTheSubmissionForProblem = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "All submission for problem fetched successfully",
-      count: submissions,
+      submissions,
+      count: submissions.length,
     });
   } catch (error) {
     res.status(500).json({
