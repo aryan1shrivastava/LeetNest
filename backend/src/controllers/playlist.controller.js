@@ -25,6 +25,34 @@ export const createPlaylist = async (req, res) => {
   }
 };
 
+// export const getAllListDetails = async (req, res) => {
+//   try {
+//     const playlists = await db.playlist.findMany({
+//       where: {
+//         userId: req.user.id,
+//       },
+//       include: {
+//         problems: {
+//           include: {
+//             problem: true,
+//           },
+//         },
+//       },
+//     });
+//     return res.status(200).json({
+//       success: true,
+//       message: "Playlists fetched successfully",
+//       playlists,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching playlists:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Error fetching playlists",
+//     });
+//   }
+// };
+
 export const getAllListDetails = async (req, res) => {
   try {
     const playlists = await db.playlist.findMany({
@@ -39,10 +67,11 @@ export const getAllListDetails = async (req, res) => {
         },
       },
     });
+
     return res.status(200).json({
       success: true,
       message: "Playlists fetched successfully",
-      playlists,
+      playlists: playlists || [],
     });
   } catch (error) {
     console.error("Error fetching playlists:", error);
@@ -102,10 +131,11 @@ export const addProblemToPlaylist = async (req, res) => {
     }
 
     //create records for each problems in the playlist
+    // console.log("Available models:", Object.keys(db));
 
-    const problemsInPlaylist = await db.playlistProblem.createMany({
+    const problemsInPlaylist = await db.problemInPlaylist.createMany({
       data: problemIds.map((problemId) => ({
-        playlistId,
+        playListId: playlistId,
         problemId,
       })),
     });
@@ -162,7 +192,7 @@ export const removeProblemFromPlaylist = async (req, res) => {
 
     const deletedProblems = await db.problemsInPlaylist.deleteMany({
       where: {
-        playlistId,
+        playListId: playlistId,
         problemId: {
           in: problemIds,
         },
