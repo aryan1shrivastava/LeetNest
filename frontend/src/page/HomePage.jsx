@@ -27,9 +27,8 @@ const HomePage = () => {
       </h1>
 
       <p className="mt-4 text-center text-lg font-semibold text-gray-500 dark:text-gray-400 z-10">
-        A Platform Inspired by Leetcode which helps you to prepare for coding
-        interviews and helps you to improve your coding skills by solving coding
-        problems
+        A community-driven platform to practice, challenge, and improve your
+        coding abilities.
       </p>
 
       {problems.length > 0 ? (
