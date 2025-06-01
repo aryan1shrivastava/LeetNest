@@ -8,8 +8,6 @@
 
 Whether you're preparing for tech interviews or simply leveling up your coding skills, **LeetNest** offers a clean and distraction-free environment tailored to help you grow.
 
-![image](https://github.com/user-attachments/assets/c93c16e8-eb9b-4f42-b134-fadb3c319a45)
-
 ---
 
 ## 🚀 Tech Stack
