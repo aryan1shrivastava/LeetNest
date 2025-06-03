@@ -142,7 +142,7 @@ const LoginPage = () => {
               </button>
 
               {/* Demo Login Button */}
-              <button
+              {/* <button
                 type="button"
                 onClick={() => {
                   demoLogin();
@@ -151,7 +151,7 @@ const LoginPage = () => {
                 className="w-full py-3 px-4 border border-gray-600 hover:border-green-500 text-gray-300 hover:text-green-400 font-medium rounded-lg transition-colors duration-200"
               >
                 Try Demo
-              </button>
+              </button> */}
             </form>
 
             {/* Footer */}
