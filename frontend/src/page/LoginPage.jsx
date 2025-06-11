@@ -84,7 +84,6 @@ const LoginPage = () => {
                   </p>
                 )}
               </div>
-
               {/* Password */}
               <div className="form-control">
                 <label className="label">
@@ -124,7 +123,6 @@ const LoginPage = () => {
                   </p>
                 )}
               </div>
-
               {/* Submit Button */}
               <button
                 type="submit"
@@ -140,9 +138,8 @@ const LoginPage = () => {
                   "Sign in"
                 )}
               </button>
-
-              {/* Demo Login Button */}
-              {/* <button
+              Demo Login Button
+              <button
                 type="button"
                 onClick={() => {
                   demoLogin();
@@ -151,7 +148,7 @@ const LoginPage = () => {
                 className="w-full py-3 px-4 border border-gray-600 hover:border-green-500 text-gray-300 hover:text-green-400 font-medium rounded-lg transition-colors duration-200"
               >
                 Try Demo
-              </button> */}
+              </button>
             </form>
 
             {/* Footer */}
