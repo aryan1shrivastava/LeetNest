@@ -131,9 +131,6 @@ const ChallengePage = () => {
                     </li>
                     <li>• You can't switch problems once started</li>
                     <li>
-                      • You can't use external resources or copy-paste code
-                    </li>
-                    <li>
                       • All test cases must pass to complete the challenge
                     </li>
                   </ul>
