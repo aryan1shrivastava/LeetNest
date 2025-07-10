@@ -31,7 +31,7 @@ _Inspired by LeetCode. Built for the next generation of coders._
 
 - **Frontend:** Interface for solving problems, submitting code, and navigating user dashboard
 - **Backend:** RESTful API to handle authentication, problems, and submission logic
-- **Database:** PostgreSQL to manage users, problems, and submission data
+- **Database:** PostgreSQL to manage users, problems
 - **External Service:** Judge0 API for compiling and executing user-submitted code in multiple languages
 
 ---
