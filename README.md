@@ -23,7 +23,7 @@ _Inspired by LeetCode. Built for the next generation of coders._
 - ⚙️ **Code Execution** — Real-time code compilation and test case validation using Judge0
 - 📊 **Submission Tracking** — Track your progress and view submission history with verdicts
 - 🔄 **Clean UI/UX** — Minimalist, responsive design focused on user experience
-- 🚧 **Upcoming:** Challenges, Discuss, Leaderboards, and more!
+- 🚧 **Upcoming:** Challenges, Leaderboards, and more!
 
 ---
 
