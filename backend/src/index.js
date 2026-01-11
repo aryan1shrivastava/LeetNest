@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://leetnest-frontend.onrender.com/",
+    origin: "https://leetnest-frontend.onrender.com",
     credentials: true,
   })
 );
