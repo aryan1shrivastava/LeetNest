@@ -25,8 +25,13 @@ export const useAuthStore = create((set) => ({
       set({ authUser: res.data.user });
     } catch (error) {
       console.log("❌ Error checking auth:", error);
-      set({ authUser: null });
-    } finally {
+
+  // Only clear auth if backend explicitly says unauthenticated
+      if (error.response?.status === 401) {
+          set({ authUser: null });
+      }
+    }
+ finally {
       set({ isCheckingAuth: false });
     }
   },
