@@ -17,8 +17,12 @@ const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
+  const id = setTimeout(() => {
     checkAuth();
+  }, 0);
+  return () => clearTimeout(id);
   }, [checkAuth]);
+
 
   if (isCheckingAuth && !authUser) {
     return (
